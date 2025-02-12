@@ -10,7 +10,7 @@ from openai import OpenAI
 
 # Generate synthetic transaction data
 def generate_synthetic_transaction_data(
-    num_customers=100, transactions_per_customer=50
+    num_customers=500, transactions_per_customer=50
 ):
     np.random.seed(42)
 
