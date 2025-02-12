@@ -15,7 +15,7 @@ load_dotenv()
 def get_openai_client():
     api_key = os.getenv("openai_api_key")
     if not api_key:
-        st.error("No OpenAI API key found. Please set your API key.")
+        print("No OpenAI API key found. Please set your API key.")
         return None
     return OpenAI(api_key=api_key)
 
@@ -138,7 +138,7 @@ def generate_personalized_message(
     if not openai_api_key:
         return f"Sample personalized message: We recommend our {recommended_product} based on your transaction history."
 
-    client = get_openai_client()
+    client = OpenAI(api_key=openai_api_key)
 
     # Prepare prompt
     prompt = f"""
@@ -149,7 +149,7 @@ def generate_personalized_message(
     
     Recommended product: {recommended_product}
     
-    Create a friendly, professional message that explains why this product is recommended.
+    Create a personal message for the product recommende.Make it short and concise.
     """
 
     try:
@@ -159,6 +159,9 @@ def generate_personalized_message(
                 {"role": "system", "content": "You are a helpful banking assistant."},
                 {"role": "user", "content": prompt},
             ],
+            max_tokens=50,
+            temperature=0.7,
+            top_p=1.0,
         )
         return response.choices[0].message.content
     except Exception as e:
@@ -218,7 +221,9 @@ def main():
 
     # Generate personalized message
     st.header("Personalized Message")
-    openai_api_key = st.text_input("Enter OpenAI API Key (optional)", type="password")
+    # openai_api_key = st.text_input("Enter OpenAI API Key (optional)", type="password")
+    # openai_api_key = get_openai_client()
+    openai_api_key = os.getenv("openai_api_key")
 
     message = generate_personalized_message(
         selected_customer, recommended_product, openai_api_key
