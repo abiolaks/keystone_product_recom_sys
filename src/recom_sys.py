@@ -6,11 +6,23 @@ from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Embedding
 from openai import OpenAI
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+
+def get_openai_client():
+    api_key = os.getenv("openai_api_key")
+    if not api_key:
+        st.error("No OpenAI API key found. Please set your API key.")
+        return None
+    return OpenAI(api_key=api_key)
 
 
 # Generate synthetic transaction data
 def generate_synthetic_transaction_data(
-    num_customers=500, transactions_per_customer=50
+    num_customers=100, transactions_per_customer=50
 ):
     np.random.seed(42)
 
@@ -60,6 +72,7 @@ def generate_synthetic_transaction_data(
         "transaction_frequency",
     ]
     df = pd.DataFrame(data, columns=columns)
+    df.to_csv("bank_dataset", index=False)
     return df
 
 
@@ -125,7 +138,7 @@ def generate_personalized_message(
     if not openai_api_key:
         return f"Sample personalized message: We recommend our {recommended_product} based on your transaction history."
 
-    client = OpenAI(api_key=openai_api_key)
+    client = get_openai_client()
 
     # Prepare prompt
     prompt = f"""
